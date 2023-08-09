@@ -1,7 +1,6 @@
 import { EmbedBuilder, WebhookClient } from 'discord.js';
-import { webhookId, webhookToken } from './config.json';
-
-const webhookClient = new WebhookClient({ id: webhookId, token: webhookToken });
+import config from './config';
+const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
 
 const embed = new EmbedBuilder()
 	.setTitle('Some Title')
