@@ -1,3 +1,7 @@
+
+import { EmbedBuilder, WebhookClient } from 'discord.js';
+import config from './config';
+
 import { chromium } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 chromium.use(StealthPlugin())
@@ -6,7 +10,7 @@ chromium.launch({ headless: false }).then(async browser => {
 
 
     const page = await browser.newPage()
-    await page.goto('https://bloxflip.com/')
+    await page.goto('http://127.0.0.1:3000/webpage/index.html')
     // await new Promise(r => setTimeout(r, 10000));
     await page.screenshot({ path: 'stealth.png', fullPage: true })
     // await page.waitForFunction(
@@ -17,15 +21,31 @@ chromium.launch({ headless: false }).then(async browser => {
     //   'document.querySelector("body").innerText.includes("18:00")',
     //   );
     
-    const node = page.locator('text="It\'s about to rain!').waitFor({timeout:0});
-    
-    // const node = await page.locator('div', { has: page.locator('text=13:06"') }).waitFor({timeout: 0})
-    console.log(node)
+    // const node = page.getByText('It’s about to rain!').locator('xpath=..').waitFor({timeout:0});
 
-    // console.log(await rainNode.innerText());
-    
+    const parent = page.getByText('It’s about to rain!').locator('xpath=..');
 
-    // await page.locator('button').wait();
+    await parent.waitFor({timeout:0});
+
+    const amountOfRobux = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[0].textContent)
+    const participants = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[2].textContent)
+    const host = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[4].textContent)
+
+    const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
+
+    const embed = new EmbedBuilder()
+        .setTitle(amountOfRobux)
+        .setURL('https://bloxflip.com/')
+        .setColor(0x00FFFF)
+        .setTimestamp()
+        .setDescription(`Host: ${host}\nParticipants: ${participants}`)
+
+    webhookClient.send({
+        username: 'cool rain notifer bot',
+        embeds: [embed],
+    });
+
+
     await browser.close()
 
 
