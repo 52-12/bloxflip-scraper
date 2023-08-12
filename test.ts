@@ -10,7 +10,8 @@ chromium.launch({ headless: false }).then(async browser => {
 
 
     const page = await browser.newPage()
-    await page.goto('http://127.0.0.1:3000/webpage/index.html')
+    //await page.goto('http://127.0.0.1:3000/webpage/index.html')
+      await page.goto('https://bloxflip.com/')
     // await new Promise(r => setTimeout(r, 10000));
     await page.screenshot({ path: 'stealth.png', fullPage: true })
     // await page.waitForFunction(
@@ -24,12 +25,47 @@ chromium.launch({ headless: false }).then(async browser => {
     // const node = page.getByText('It’s about to rain!').locator('xpath=..').waitFor({timeout:0});
 
     const parent = page.getByText('It’s about to rain!').locator('xpath=..');
-
+    
     await parent.waitFor({timeout:0});
 
-    const amountOfRobux = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[0].textContent)
-    const participants = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[2].textContent)
-    const host = await parent.getByRole("paragraph").filter({hasText: 'participants'}).evaluate(p => p.childNodes[4].textContent)
+    const paragraph = parent.getByRole("paragraph").filter({hasText: 'participants'});
+
+    let amountOfRobux = await paragraph.evaluate(p => p.childNodes[0].textContent);
+    let participants = await paragraph.evaluate(p => p.childNodes[2].textContent);
+    let host = await paragraph.evaluate(p => p.childNodes[4].textContent);
+
+    if (amountOfRobux){
+        const match = amountOfRobux.match('by (.*)')
+        if (match) {
+            amountOfRobux = amountOfRobux + 'Rain'
+        } else { 
+            amountOfRobux = 'It\'s broken! :('
+        }
+    } else {
+        amountOfRobux = 'It\'s broken! :('
+    }
+
+    if (participants){
+        const match = participants.match('\d+')
+        if (match) {
+            participants = match[0]
+        } else { 
+            participants = 'It\'s broken! :('
+        }
+    } else {
+        participants = 'It\'s broken! :('
+    }
+
+    if (host){
+        const match = host.match('by (.*)')
+        if (match) {
+            host = match[1]
+        } else { 
+            host = 'It\'s broken! :('
+        }
+    } else {
+        host = 'It\'s broken! :('
+    }
 
     const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
 
