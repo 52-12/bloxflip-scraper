@@ -13,36 +13,41 @@ chromium.launch({ headless: false }).then(async browser => {
     // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
     await page.goto('https://bloxflip.com/')
     
-    const parent = page.getByRole("heading").getByText('It’s about to rain!').locator('xpath=..');
-    
-    await parent.waitFor({ timeout: 0 });
-    const paragraph = parent.getByRole("paragraph").filter({ hasText: 'participants' });
-    
-    // console.info(await page.content())
-    console.info(await paragraph.innerHTML())
-
-    
-    const numbersRegex = (await paragraph.innerText()).match(/\b\d[\d,.]*\b/g)
-    const amountOfRobux = numbersRegex ? numbersRegex[0] : "it's broken"
-    const participants = numbersRegex ? numbersRegex[1] : "it's broken"
-
-    const hostRegex = (await paragraph.innerText()).match(/by (.*)/)
-    const host = hostRegex ? hostRegex[1] : "it's broken"
-    console.log({ "amountOfRobux": amountOfRobux, "participants": participants, "host": host })
-
     const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
 
-    const embed = new EmbedBuilder()
-        .setTitle(`${amountOfRobux} Rain`)
-        .setURL('https://bloxflip.com/')
-        .setColor(0x00FFFF)
-        .setTimestamp()
-        .setDescription(`Host: ${host}\nParticipants: ${participants} participants`)
+    while (true){
+        console.log("Waiting for rain to start")
+        const parent = page.getByRole("heading").getByText('It’s about to rain!').locator('xpath=..');
+        
+        await parent.waitFor({ timeout: 0 });
+        const paragraph = parent.getByRole("paragraph").filter({ hasText: 'participants' });
+        
+        // console.info(await page.content())
+        // console.info(await paragraph.innerHTML())
 
-    webhookClient.send({
-        username: 'cool rain notifer bot',
-        embeds: [embed],
-    });
+        
+        const numbersRegex = (await paragraph.innerText()).match(/\b\d[\d,.]*\b/g)
+        const amountOfRobux = numbersRegex ? numbersRegex[0] : "it's broken"
+        const participants = numbersRegex ? numbersRegex[1] : "it's broken"
 
-    await browser.close()
+        const hostRegex = (await paragraph.innerText()).match(/by (.*)/)
+        const host = hostRegex ? hostRegex[1] : "it's broken"
+        console.log({ "amountOfRobux": amountOfRobux, "participants": participants, "host": host })
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${amountOfRobux} Rain`)
+            .setURL('https://bloxflip.com/')
+            .setColor(0x00FFFF)
+            .setTimestamp()
+            .setDescription(`Host: ${host}\nParticipants: ${participants} participants`)
+
+        webhookClient.send({
+            username: 'cool rain notifer bot',
+            embeds: [embed],
+        });
+
+        console.log("Sent webhook. Waiting for rain to end...")
+        await page.locator('body', {hasNot: parent}).waitFor({ timeout: 0 });
+        console.log("Rain has ended")
+    }
 })
