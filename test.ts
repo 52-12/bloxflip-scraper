@@ -13,10 +13,9 @@ chromium.launch({ headless: false }).then(async browser => {
     // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
     await page.goto('https://bloxflip.com/')
     
-    const parent = page.getByText('It’s about to rain!').locator('xpath=..');
+    const parent = page.getByRole("heading").getByText('It’s about to rain!').locator('xpath=..');
     
     await parent.waitFor({ timeout: 0 });
-    
     const paragraph = parent.getByRole("paragraph").filter({ hasText: 'participants' });
     
     // console.info(await page.content())
@@ -29,7 +28,7 @@ chromium.launch({ headless: false }).then(async browser => {
 
     const hostRegex = (await paragraph.innerText()).match(/by (.*)/)
     const host = hostRegex ? hostRegex[1] : "it's broken"
-    console.log({ "amountOfRobux": amountOfRobux, "participants": participants, "host": host[1] })
+    console.log({ "amountOfRobux": amountOfRobux, "participants": participants, "host": host })
 
     const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
 
