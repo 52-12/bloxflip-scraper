@@ -60,11 +60,21 @@ chromium.launch({ headless: false }).then(async browser => {
 
         runLoop.add(webhookMessage.id)
 
+        /**
+         * Make a promise that loops between these 3 steps:
+         * 1. get's the page's inner text
+         * 2. checks if inner text participants is different then the one on discord
+         * 3a. if it is different: edits the message on discord.
+         * 3b. if it is the same: does not edit
+         */
         new Promise((resolve, reject) => {
             
-            (function loop() {
+            const loop = () => {
                 setTimeout(async () => {
                     let newRainInfo = {amountOfRobux: '', participants: '', host: ''}
+
+
+                    // 1. get's the page's inner text
                     try {
                         newRainInfo = await getParagraphState(paragraph)
                     } catch (error) {
@@ -72,33 +82,42 @@ chromium.launch({ headless: false }).then(async browser => {
                             if (!runLoop.has(webhookMessage.id)) {
                                 console.log(`Stopped editing message: ${webhookMessage.id}`)
                                 return resolve(true)
-                            } else {
-                                throw error
                             }
+                        } else {
+                            throw error;
                         }
                     }
 
+
+                    // 2. checks if inner text participants is different then the one on discord
                     if (newRainInfo.participants !== rainInfo.participants) {
+
+                        // 3a. if it is different: edits the message on discord.
                         rainInfo = newRainInfo;
                         console.log('Updating participants...', { "amountOfRobux": rainInfo.amountOfRobux, "participants": rainInfo.participants, "host": rainInfo.host })
                         await webhookClient.editMessage(webhookMessage.id, {
                             embeds: [getEmbed(rainInfo.amountOfRobux, rainInfo.host, rainInfo.participants)],
                         });
                     } else {
+
+                         // 3b. if it is the same: does not edit
                         console.log(`Not editing message since it's the same: ${webhookMessage.id}`)
                     }
 
-                    loop()
+                    loop() // starts the loop all over again
                 }, 5000);
-            }());
+            };
+            
+            loop()
 
         });
 
-
         console.log("Sent webhook. Waiting for rain to end...")
+        
         await page.locator('body', { hasNot: parent }).waitFor({ timeout: 0 });
+        
         console.log("Rain has ended")
-
+        
         runLoop.delete(webhookMessage.id);
     }
 })
