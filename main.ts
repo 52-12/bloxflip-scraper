@@ -1,21 +1,57 @@
 
-import { EmbedBuilder, WebhookClient } from 'discord.js';
-import config from './config';
+import { EmbedBuilder, WebhookClient, APIMessage } from 'discord.js';
 
 import playwright, { chromium } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 chromium.use(StealthPlugin())
+
+import fs from 'fs';
+
+let config: { url: string };
+
+const askAndMakeConfig = () => {
+    const prompt = require("prompt-sync")({ sigint: true });
+    const webhookURL = prompt("Insert webhook url (and only the webhook url) this rain notifer is going to use ");
+
+    config = { url: webhookURL }
+
+    const configString = JSON.stringify(config);
+    fs.writeFile('./config.json', configString, 'utf8', () => { });
+    console.log("Saved setting to ./config.json")
+}
+
+if (fs.existsSync('./config.json')) { // check if the json file exists
+    // check if the json file is valid
+    try {
+        config = require('./config.json');
+    } catch (error) {
+        if (error instanceof SyntaxError) {
+            askAndMakeConfig()
+        } else {
+            throw error;
+        }
+    }
+} else {
+    askAndMakeConfig()
+}
+
+let webhookClient: WebhookClient;
+
+try {
+    webhookClient = new WebhookClient({ url: config!.url });
+} catch (error: unknown) {
+    fs.rmSync('./config.json');
+    throw "Please restart the program";
+}
+let runLoop = new Set();
 
 chromium.launch({ headless: false }).then(async browser => {
     const page = await browser.newPage()
     // await page.goto('http://127.0.0.1:3000/webpage/6unfiree.html')
     // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
     // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
-    await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
-    // await page.goto('https://bloxflip.com/')
-
-    const webhookClient = new WebhookClient({ id: config.webhookId, token: config.webhookToken });
-    let runLoop = new Set();
+    // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
+    await page.goto('https://bloxflip.com/')
 
     while (true) {
         console.log("Waiting for rain to start")
@@ -53,10 +89,16 @@ chromium.launch({ headless: false }).then(async browser => {
 
         const embed = getEmbed(rainInfo.amountOfRobux, rainInfo.host, rainInfo.participants)
 
-        const webhookMessage = await webhookClient.send({
-            username: 'cool rain notifer bot',
-            embeds: [embed],
-        });
+        let webhookMessage: APIMessage;
+        try {
+            webhookMessage = await webhookClient.send({
+                username: 'Rain Notifier Bot',
+                embeds: [embed],
+            });
+        } catch (error) {
+            fs.rmSync('./config.json');
+            throw `${error}. Please restart the program.`
+        }
 
         runLoop.add(webhookMessage.id)
 
@@ -68,11 +110,11 @@ chromium.launch({ headless: false }).then(async browser => {
          * 3b. if it is the same: does not edit
          */
         new Promise((resolve, reject) => {
-            
+
             const loop = () => {
                 if (runLoop.has(webhookMessage.id)) {
                     setTimeout(async () => {
-                        let newRainInfo = {amountOfRobux: '', participants: '', host: ''}
+                        let newRainInfo = { amountOfRobux: '', participants: '', host: '' }
 
 
                         // 1. get's the page's inner text
@@ -108,7 +150,7 @@ chromium.launch({ headless: false }).then(async browser => {
                             console.log(`Not editing message since it's the same: ${webhookMessage.id}`)
                         }
 
-                    loop() // starts the loop all over again
+                        loop() // starts the loop all over again
                     }, 5000);
 
                 } else {
@@ -116,17 +158,17 @@ chromium.launch({ headless: false }).then(async browser => {
                     return resolve(true)
                 }
             };
-            
+
             loop()
 
         });
 
         console.log("Sent webhook. Waiting for rain to end...")
-        
+
         await page.locator('body', { hasNot: parent }).waitFor({ timeout: 0 });
-        
+
         console.log("Rain has ended")
-        
+
         runLoop.delete(webhookMessage.id);
     }
 })
