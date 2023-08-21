@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "rain notifer for bloxflip",
   "main": "main.ts",
+  "keywords": [
+    "prettier"
+  ],
   "scripts": {
     "start": "ts-node main.ts"
   },
@@ -20,10 +23,11 @@
     "discord.js": "^14.13.0",
     "playwright-extra": "^4.3.6",
     "prompt-sync": "^4.2.0",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
-  },
-  "devDependencies": {
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.0"
   }
 }
