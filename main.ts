@@ -1,7 +1,10 @@
 import { EmbedBuilder, WebhookClient, APIMessage } from "discord.js";
 
-import playwright, { chromium } from "playwright-extra";
+import playwright from "playwright";
+import { addExtra } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+
+const chromium = addExtra(playwright.chromium);
 chromium.use(StealthPlugin());
 
 import fs from "fs";
