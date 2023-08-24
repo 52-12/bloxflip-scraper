@@ -25,7 +25,8 @@ if (fs.existsSync("./config.json")) {
   // check if the json file exists
   // check if the json file is valid
   try {
-    config = require("./config.json");
+    const data = fs.readFileSync("./config.json");
+    config = JSON.parse(data.toString());
   } catch (error) {
     if (error instanceof SyntaxError) {
       askAndMakeConfig();
