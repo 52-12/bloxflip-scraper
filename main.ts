@@ -3,16 +3,19 @@ import { EmbedBuilder, WebhookClient, APIMessage } from "discord.js";
 import playwright from "playwright";
 import { addExtra } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import promptSync from 'prompt-sync';
+import fs from "fs";
+
+import findChrome from '@vlasky/chrome-finder';
+const chromePath = findChrome();
 
 const chromium = addExtra(playwright.chromium);
 chromium.use(StealthPlugin());
 
-import fs from "fs";
-
 let config;
 
 const askAndMakeConfig = () => {
-  const prompt = require("prompt-sync")({ sigint: true });
+  const prompt = promptSync({ sigint: true })
   const webhookURL = prompt(
     "Insert webhook url (and only the webhook url) this rain notifer is going to use "
   );
@@ -20,7 +23,7 @@ const askAndMakeConfig = () => {
   config = { url: webhookURL };
 
   const configString = JSON.stringify(config);
-  fs.writeFile("./config.json", configString, "utf8", () => {});
+  fs.writeFile("./config.json", configString, "utf8", () => { });
   console.log("Saved setting to ./config.json");
 };
 
@@ -51,7 +54,7 @@ try {
 }
 let runLoop = new Set();
 
-chromium.launch({ headless: false }).then(async (browser) => {
+chromium.launch({ headless: false, executablePath: chromePath }).then(async (browser) => {
   const page = await browser.newPage();
   // await page.goto('http://127.0.0.1:3000/webpage/6unfiree.html')
   // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
@@ -209,4 +212,12 @@ chromium.launch({ headless: false }).then(async (browser) => {
 
     runLoop.delete(webhookMessage.id);
   }
+}).catch((e) => {
+  console.log(e.message)
+  console.log('Press any key to exit');
+
+  process.stdin.setRawMode(true);
+  process.stdin.resume();
+  process.stdin.on('data', process.exit.bind(process, 0));
 });
+
