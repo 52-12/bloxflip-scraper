@@ -4,7 +4,7 @@
 A program that notifes people (including discord and text messages) everytime there is a rain at bloxflip.
 
 # Installation
-Go to the releases on the right side of this page and download the zip folder. 
+For windows: Go to the releases on the right side of this page and download the zip folder. 
 
 Extract the zip, then put the folder to your desktop. 
 
