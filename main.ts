@@ -99,7 +99,6 @@ chromium.launch({ headless: false, executablePath: chromePath }).then(async (bro
         .setTitle(`${amountOfRobux} Rain`)
         .setURL("https://bloxflip.com/")
         .setColor(0x00ffff)
-        .setTimestamp()
         .setDescription(
           `Host: ${host}\nParticipants: ${participants} participants`
         );
