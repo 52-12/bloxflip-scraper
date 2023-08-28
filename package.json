@@ -27,7 +27,6 @@
     "discord.js": "^14.13.0",
     "playwright": "^1.37.1",
     "playwright-extra": "^4.3.6",
-    "prompt-sync": "^4.2.0",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "devDependencies": {
@@ -35,7 +34,6 @@
     "@babel/core": "^7.22.11",
     "@babel/preset-env": "^7.22.10",
     "@babel/preset-typescript": "^7.22.11",
-    "@types/prompt-sync": "^4.2.0",
     "pkg": "^5.8.1",
     "prettier": "^2.8.0",
     "ts-node": "^10.9.1",
