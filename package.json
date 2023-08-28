@@ -1,49 +1,49 @@
 {
-  "name": "bloxflip-scraper",
-  "version": "1.0.0",
-  "description": "rain notifer for bloxflip",
-  "main": "main.ts",
-  "keywords": [
-    "prettier"
-  ],
-  "scripts": {
-    "start": "ts-node main.ts",
-    "build": "npm run transpile && npm run dist",
-    "transpile": "babel main.ts --out-file ./dist/main.js",
-    "dist": "pkg . --out-path ./dist"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/52-12/bloxflip-scraper.git"
-  },
-  "author": "5212",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/52-12/bloxflip-scraper/issues"
-  },
-  "homepage": "https://github.com/52-12/bloxflip-scraper#readme",
-  "dependencies": {
-    "@vlasky/chrome-finder": "^1.0.9",
-    "discord.js": "^14.13.0",
-    "playwright": "^1.37.1",
-    "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
-  },
-  "devDependencies": {
-    "@babel/cli": "^7.22.10",
-    "@babel/core": "^7.22.11",
-    "@babel/preset-env": "^7.22.10",
-    "@babel/preset-typescript": "^7.22.11",
-    "pkg": "^5.8.1",
-    "prettier": "^2.8.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.6"
-  },
-  "bin": "./dist/main.js",
-  "pkg": {
-    "scripts": [
-      "node_modules/puppeteer/lib/*.js",
-      "node_modules/puppeteer-extra-plugin-stealth/**/*.js"
-    ]
-  }
+    "name": "bloxflip-scraper",
+    "version": "1.0.0",
+    "description": "rain notifer for bloxflip",
+    "main": "main.ts",
+    "keywords": [
+        "prettier"
+    ],
+    "scripts": {
+        "start": "ts-node main.ts",
+        "build": "npm run transpile && npm run dist",
+        "transpile": "babel main.ts --out-file ./dist/main.js",
+        "dist": "pkg . --out-path ./dist"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/52-12/bloxflip-scraper.git"
+    },
+    "author": "5212",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/52-12/bloxflip-scraper/issues"
+    },
+    "homepage": "https://github.com/52-12/bloxflip-scraper#readme",
+    "dependencies": {
+        "@vlasky/chrome-finder": "^1.0.9",
+        "discord.js": "^14.13.0",
+        "playwright": "^1.37.1",
+        "playwright-extra": "^4.3.6",
+        "puppeteer-extra-plugin-stealth": "^2.11.2"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.22.10",
+        "@babel/core": "^7.22.11",
+        "@babel/preset-env": "^7.22.10",
+        "@babel/preset-typescript": "^7.22.11",
+        "pkg": "^5.8.1",
+        "prettier": "^2.8.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.1.6"
+    },
+    "bin": "./dist/main.js",
+    "pkg": {
+        "scripts": [
+            "node_modules/puppeteer/lib/*.js",
+            "node_modules/puppeteer-extra-plugin-stealth/**/*.js"
+        ]
+    }
 }
