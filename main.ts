@@ -238,6 +238,16 @@ chromium
 
             console.log("Rain has ended");
 
+            await webhookClient.editMessage(webhookMessage.id, {
+                content: 'Rain has ended',
+                embeds: [
+                    getEmbed(
+                        rainInfo.amountOfRobux,
+                        rainInfo.host,
+                        rainInfo.participants
+                    ),
+                ],
+            });
             runLoop.delete(webhookMessage.id);
         }
     })
