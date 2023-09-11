@@ -112,7 +112,13 @@ chromium
                     .setURL("https://bloxflip.com/")
                     .setColor(0x00ffff)
                     .setDescription(
-                        `Host: ${host}\nParticipants: ${participants} participants`
+                        `Host: ${host}
+                        Participants: ${participants} participants
+                        Robux Per Participant: ${(
+                            Number(amountOfRobux.replace(/,/g, "")) /
+                            Number(participants)
+                        ).toFixed(2)} 
+                        `
                     );
             };
 
@@ -239,7 +245,7 @@ chromium
             console.log("Rain has ended");
 
             await webhookClient.editMessage(webhookMessage.id, {
-                content: 'Rain has ended',
+                content: "Rain has ended",
                 embeds: [
                     getEmbed(
                         rainInfo.amountOfRobux,
