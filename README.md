@@ -1,7 +1,7 @@
 # bloxflip-scraper
 
 
-A program that notifes people (including discord and text messages) everytime there is a rain at bloxflip.
+A program that notifes people (using discord's webhook) everytime there is a rain at bloxflip.
 
 # Installation
 For windows: Go to the releases on the right side of this page and download the zip folder. 
