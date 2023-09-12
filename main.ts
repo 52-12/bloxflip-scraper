@@ -4,7 +4,8 @@ import playwright from "playwright";
 import { addExtra } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import fs from "fs";
-
+import os from "os";
+import child_process from "child_process";
 import findChrome from "@vlasky/chrome-finder";
 const chromePath = findChrome();
 
@@ -13,20 +14,42 @@ chromium.use(StealthPlugin());
 
 let config;
 
-const prompt = (msg: string) => {
-    fs.writeSync(1, String(msg));
-    let s = "",
-        buf = Buffer.alloc(1);
-    while (buf[0] - 10 && buf[0] - 13) (s += buf), fs.readSync(0, buf, 0, 1, 0);
-    return s.slice(1);
-};
+// Synchronously prompt for input
+function prompt(message: string) {
+    // Write message
+    process.stdout.write(message);
+
+    // Work out shell command to prompt for a string and echo it to stdout
+    let cmd: string;
+    let args: string[];
+    if (os.platform() == "win32") {
+        cmd = "cmd";
+        args = ["/V:ON", "/C", "set /p response= && echo !response!"];
+    } else {
+        cmd = "bash";
+        args = ["-c", 'read response; echo "$response"'];
+    }
+
+    // Pipe stdout back to self so we can read the echoed value
+    let opts = {
+        stdio: ["inherit", "pipe", "inherit"],
+        shell: false,
+    };
+
+    // Run it
+    // @ts-ignore
+    return child_process.spawnSync(cmd, args, opts).stdout.toString().trim();
+}
 
 const askAndMakeConfig = () => {
     const webhookURL = prompt(
         "Insert webhook url (and only the webhook url) this rain notifer is going to use "
     );
+    const pingWho = prompt(
+        "Insert who to ping (can be a role or @everyone, if you don't know what this question means do @everyone).\nIf your doing a role copy the role id and paste it like this <@&(role id)>"
+    );
 
-    config = { url: webhookURL };
+    config = { url: webhookURL, pingWho };
 
     const configString = JSON.stringify(config);
     fs.writeFile("./config.json", configString, "utf8", () => {});
@@ -64,11 +87,11 @@ chromium
     .launch({ headless: false, executablePath: chromePath })
     .then(async (browser) => {
         const page = await browser.newPage();
-        // await page.goto('http://127.0.0.1:3000/webpage/6unfiree.html')
+        await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
         // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
         // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
         // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
-        await page.goto("https://bloxflip.com/");
+        // await page.goto("https://bloxflip.com/");
 
         while (true) {
             console.log("Waiting for rain to start");
@@ -140,6 +163,9 @@ chromium
             try {
                 webhookMessage = await webhookClient.send({
                     username: "Rain Notifier Bot",
+                    content: `${rainInfo.amountOfRobux} by ${rainInfo.host} ${
+                        config!.pingWho
+                    }`,
                     embeds: [embed],
                 });
             } catch (error) {
