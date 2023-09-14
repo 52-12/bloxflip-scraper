@@ -95,8 +95,8 @@ chromium
         // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
         // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
         await page.goto("https://bloxflip.com/");
-        let lastRain = { amountOfRobux: "", participants: "", host: "" };
         while (true) {
+            let robloxAvatar = "";
             console.log("Waiting for rain to start");
             const parent = page
                 .getByRole("heading")
@@ -130,19 +130,26 @@ chromium
                 host: string,
                 participants: string
             ) => {
-                return new EmbedBuilder()
+                let embed = new EmbedBuilder()
                     .setTitle(`${amountOfRobux} Rain`)
                     .setURL("https://bloxflip.com/")
                     .setColor(0x00ffff)
+                    .setTimestamp()
+                    .setFooter({ text: "Last edited at: " })
                     .setDescription(
-                        `Host: ${host}
-                        Participants: ${participants} participants
-                        Robux Per Participant: ${(
+                        `**Host:** ${host}
+                        **Participants:** ${participants} participants
+                        **Robux Per Participant:** ${(
                             Number(amountOfRobux.replace(/,/g, "")) /
                             Number(participants)
                         ).toFixed(2)} 
                         `
                     );
+                if (robloxAvatar) {
+                    return embed.setThumbnail(robloxAvatar);
+                } else {
+                    return embed;
+                }
             };
 
             const waitForRainToEnd = async (page: playwright.Page) => {
@@ -154,7 +161,6 @@ chromium
             };
 
             let rainInfo = await getParagraphState(paragraph);
-            lastRain = rainInfo;
             if (
                 Number(rainInfo.amountOfRobux.replace(/,/g, "")) >
                 Number(config.minimumRain)
@@ -185,6 +191,40 @@ chromium
                     throw `${error}. Please restart the program.`;
                 }
 
+                new Promise(async (res, rej) => {
+                    if (rainInfo.host == 'Anonymous')
+                        return
+                    const response = await fetch(
+                        `https://www.roblox.com/users/profile?username=${rainInfo.host}`
+                    );
+                    if (!response.ok) {
+                        console.log(`Could not find roblox avatar
+                        ${response.statusText}`);
+                    } else {
+                        // return the only digits in the URL "the User ID"
+                        const id = response.url.match(/\d+/)![0];
+                        console.log(`Found roblox user id: ${id}`);
+
+                        const avatarResponse = await fetch(
+                            `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${id}&size=420x420&format=Png&isCircular=false`
+                        );
+                        const avatarResponseJson = await avatarResponse.json();
+                        robloxAvatar = avatarResponseJson.data[0].imageUrl;
+
+                        console.log(`Found avatar link: ${robloxAvatar}`);
+                        console.log(`Sending updated embed with image`);
+
+                        await webhookClient.editMessage(webhookMessage.id, {
+                            embeds: [
+                                getEmbed(
+                                    rainInfo.amountOfRobux,
+                                    rainInfo.host,
+                                    rainInfo.participants
+                                ),
+                            ],
+                        });
+                    }
+                });
                 runLoop.add(webhookMessage.id);
 
                 /**
