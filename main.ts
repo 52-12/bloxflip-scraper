@@ -137,7 +137,7 @@ chromium
                     .setTimestamp()
                     .setFooter({ text: "Last edited at: " })
                     .setDescription(
-                        `**Host:** ${host}
+                        `**Host:** [${host}](https://www.roblox.com/users/profile?username=${rainInfo.host})
                         **Participants:** ${participants} participants
                         **Robux Per Participant:** ${(
                             Number(amountOfRobux.replace(/,/g, "")) /
