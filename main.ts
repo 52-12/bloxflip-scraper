@@ -138,8 +138,8 @@ chromium
                     .setFooter({ text: "Last edited at: " })
                     .setDescription(
                         `**Host:** [${host}](https://www.roblox.com/users/profile?username=${rainInfo.host})
-                        **Participants:** ${participants} participants
-                        **Robux Per Participant:** ${(
+**Participants:** ${participants}
+**Robux Per Participant** ${(
                             Number(amountOfRobux.replace(/,/g, "")) /
                             Number(participants)
                         ).toFixed(2)} 
