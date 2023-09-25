@@ -87,7 +87,7 @@ try {
 let runLoop = new Set();
 
 chromium
-    .launch({ headless: true, executablePath: chromePath })
+    .launch({ headless: false, executablePath: chromePath })
     .then(async (browser) => {
         const page = await browser.newPage();
         // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
@@ -95,6 +95,9 @@ chromium
         // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
         // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
         await page.goto("https://bloxflip.com/");
+        await page.getByRole("button", { name: "Understood! 🕹️" }).click();
+        await page.getByLabel("Open chat").click();
+
         while (true) {
             let robloxAvatar = "";
             console.log("Waiting for rain to start");
@@ -137,7 +140,9 @@ chromium
                     .setTimestamp()
                     .setFooter({ text: "Last edited at: " })
                     .setDescription(
-                        `**Host:** [${host}](https://www.roblox.com/users/profile?username=${rainInfo.host})
+                        `**Host:** [${host}](https://www.roblox.com/users/profile?username=${
+                            rainInfo.host
+                        })
 **Participants:** ${participants}
 **Robux Per Participant** ${(
                             Number(amountOfRobux.replace(/,/g, "")) /
@@ -192,8 +197,7 @@ chromium
                 }
 
                 new Promise(async (res, rej) => {
-                    if (rainInfo.host == 'Anonymous')
-                        return
+                    if (rainInfo.host == "Anonymous") return;
                     const response = await fetch(
                         `https://www.roblox.com/users/profile?username=${rainInfo.host}`
                     );

@@ -10,7 +10,8 @@
         "start": "ts-node main.ts",
         "build": "npm run transpile && npm run dist",
         "transpile": "babel main.ts --out-file ./dist/main.js",
-        "dist": "pkg . --out-path ./dist"
+        "dist": "pkg . --out-path ./dist",
+        "codegen": "playwright codegen https://bloxflip.com/"
     },
     "repository": {
         "type": "git",
