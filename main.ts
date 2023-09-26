@@ -1,5 +1,7 @@
-import { EmbedBuilder, WebhookClient, APIMessage } from "discord.js";
+import { WebhookClient, APIMessage } from "discord.js";
 
+import { getEmbed } from "./webhook";
+import { getParagraphState, waitForRainToEnd } from "./pageView";
 import playwright from "playwright";
 import { addExtra } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
@@ -111,60 +113,6 @@ chromium
                 .getByRole("paragraph")
                 .filter({ hasText: "participants" });
 
-            const getParagraphState = async (p: typeof paragraph) => {
-                const numbersRegex = (
-                    await p.innerText({ timeout: 200 })
-                ).match(/\b\d[\d,.]*\b/g);
-                const amountOfRobux = numbersRegex
-                    ? numbersRegex[0]
-                    : "it's broken";
-                const participants = numbersRegex
-                    ? numbersRegex[1]
-                    : "it's broken";
-
-                const hostRegex = (await p.innerText()).match(/by (.*)/);
-                const host = hostRegex ? hostRegex[1] : "it's broken";
-
-                return { amountOfRobux, participants, host };
-            };
-
-            const getEmbed = (
-                amountOfRobux: string,
-                host: string,
-                participants: string
-            ) => {
-                let embed = new EmbedBuilder()
-                    .setTitle(`${amountOfRobux} Rain`)
-                    .setURL("https://bloxflip.com/")
-                    .setColor(0x00ffff)
-                    .setTimestamp()
-                    .setFooter({ text: "Last edited at: " })
-                    .setDescription(
-                        `**Host:** [${host}](https://www.roblox.com/users/profile?username=${
-                            rainInfo.host
-                        })
-**Participants:** ${participants}
-**Robux Per Participant** ${(
-                            Number(amountOfRobux.replace(/,/g, "")) /
-                            Number(participants)
-                        ).toFixed(2)} 
-                        `
-                    );
-                if (robloxAvatar) {
-                    return embed.setThumbnail(robloxAvatar);
-                } else {
-                    return embed;
-                }
-            };
-
-            const waitForRainToEnd = async (page: playwright.Page) => {
-                await page
-                    .locator("body", { hasNot: parent })
-                    .waitFor({ timeout: 0 });
-
-                console.log("Rain has ended");
-            };
-
             let rainInfo = await getParagraphState(paragraph);
             if (
                 Number(rainInfo.amountOfRobux.replace(/,/g, "")) >
@@ -179,7 +127,8 @@ chromium
                 const embed = getEmbed(
                     rainInfo.amountOfRobux,
                     rainInfo.host,
-                    rainInfo.participants
+                    rainInfo.participants,
+                    robloxAvatar
                 );
 
                 let webhookMessage: APIMessage;
@@ -223,7 +172,8 @@ chromium
                                 getEmbed(
                                     rainInfo.amountOfRobux,
                                     rainInfo.host,
-                                    rainInfo.participants
+                                    rainInfo.participants,
+                                    robloxAvatar
                                 ),
                             ],
                         });
@@ -293,7 +243,8 @@ chromium
                                                 getEmbed(
                                                     rainInfo.amountOfRobux,
                                                     rainInfo.host,
-                                                    rainInfo.participants
+                                                    rainInfo.participants,
+                                                    robloxAvatar
                                                 ),
                                             ],
                                         }
@@ -320,7 +271,7 @@ chromium
 
                 console.log("Sent webhook. Waiting for rain to end...");
 
-                await waitForRainToEnd(page);
+                await waitForRainToEnd(page, parent);
 
                 await webhookClient.editMessage(webhookMessage.id, {
                     content: "Rain has ended",
@@ -328,7 +279,8 @@ chromium
                         getEmbed(
                             rainInfo.amountOfRobux,
                             rainInfo.host,
-                            rainInfo.participants
+                            rainInfo.participants,
+                            robloxAvatar
                         ),
                     ],
                 });
@@ -339,7 +291,7 @@ chromium
                     rainInfo
                 );
                 console.log("Waiting for rain to end...");
-                await waitForRainToEnd(page);
+                await waitForRainToEnd(page, parent);
             }
         }
     })
