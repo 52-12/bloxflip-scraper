@@ -10,6 +10,29 @@ Extract the zip, then put the folder to your desktop.
 
 Run the .exe in the folder.
 
+# Features
+Catches rains when it has 1 or 0 Participants
+
+Very stealthy - it's almost like you just afk'ed on the website
+
+Edits message when rain has ended
+
+Live participants
+
+Has Robux Per Participant (so you can know how much robux you could or have gotten.)
+
+Displays the host of the rain
+
+Shows profile of the host
+
+Shows when it was last edited
+
+Can ping role or everyone
+
+![image](https://github.com/52-12/bloxflip-scraper/assets/99885370/055a46b2-397d-48b0-b60a-7231e9636291)
+
+
+
 # FAQ
 Q: Can I trust you?
 
