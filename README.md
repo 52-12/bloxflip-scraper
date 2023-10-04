@@ -10,6 +10,29 @@ Extract the zip, then put the folder to your desktop.
 
 Run the .exe in the folder.
 
+## Developer Installation
+
+Make sure you have [chrome](https://www.google.com/chrome/), [node-js](https://nodejs.org/en), and [git](https://git-scm.com/downloads)
+
+Download the program
+
+`git clone https://github.com/52-12/bloxflip-scraper.git`
+
+
+Go to the bloxflip-scraper directory
+
+`cd bloxflip-scraper`
+
+
+Install requirements
+
+`npm i`
+
+Run the program
+
+
+`npm run start`
+
 # Features
 Catches rains when it has 1 or 0 Participants
 
