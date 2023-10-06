@@ -1,5 +1,100 @@
-import { WebhookClient, APIMessage } from "discord.js";
+import { ConsoleManager, ConfirmPopup, PageBuilder } from "console-gui-tools";
 
+const opt = {
+    title: "Layout Test",
+    layoutOptions: {
+        type: "quad",
+        boxed: true, // Set to true to enable boxed layout
+        showTitle: true, // Set to false to hide title
+        changeFocusKey: "ctrl+l", // Change layout with ctrl+l to switch to the logs page
+        boxColor: "yellow",
+        boxStyle: "bold",
+        fitHeight: true,
+    },
+    logLocation: 1,
+    enableMouse: true,
+};
+
+// @ts-ignore
+const GUI = new ConsoleManager(opt);
+
+GUI.on("exit", () => {
+    closeApp();
+});
+
+GUI.on("keypressed", (key) => {
+    switch (key.name) {
+        case "q":
+            new ConfirmPopup({
+                id: "popupQuit",
+                title: "Are you sure you want to quit?",
+            })
+                .show()
+                .on("confirm", () => closeApp());
+            break;
+        default:
+            break;
+    }
+});
+
+const closeApp = () => {
+    console.clear();
+    process.exit();
+};
+
+GUI.refresh();
+
+const loremIpsumPage = new PageBuilder();
+
+loremIpsumPage.addRow({
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    color: "red",
+    bg: "bgBlue",
+});
+
+loremIpsumPage.addRow({
+    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    color: "blue",
+    bg: "bgRed",
+});
+
+loremIpsumPage.addRow({
+    text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    color: "green",
+    bg: "bgYellow",
+});
+
+loremIpsumPage.addRow({
+    text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    color: "yellow",
+    bg: "bgGreen",
+});
+
+loremIpsumPage.addRow({
+    text: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    color: "cyan",
+    bg: "bgMagenta",
+});
+
+const loremIpsumOverflowedPage = new PageBuilder();
+
+// add some random text to the page
+for (let i = 0; i < 100; i++) {
+    loremIpsumOverflowedPage.addRow({
+        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        color: "red",
+        bg: "bgBlue",
+    });
+}
+
+GUI.setPage(loremIpsumPage, 0, "Lorem Ipsum");
+GUI.setPage(loremIpsumOverflowedPage, 3, "Lorem Ipsum Overflowed");
+GUI.setPage(new PageBuilder(), 2, "Page 3");
+new ConfirmPopup({ id: "popupQuit", title: "Are you sure you want to quit?" })
+    .show()
+    .on("confirm", () => closeApp());
+console.log("Done");
+import { WebhookClient, APIMessage } from "discord.js";
 import { getEmbed } from "./webhook";
 import { getParagraphState, waitForRainToEnd } from "./pageView";
 import playwright from "playwright";
@@ -89,7 +184,7 @@ try {
 let runLoop = new Set();
 
 chromium
-    .launch({ headless: true, executablePath: chromePath })
+    .launch({ headless: false, executablePath: chromePath })
     .then(async (browser) => {
         const page = await browser.newPage();
         // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
