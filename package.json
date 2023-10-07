@@ -25,6 +25,7 @@
     "homepage": "https://github.com/52-12/bloxflip-scraper#readme",
     "dependencies": {
         "@vlasky/chrome-finder": "^1.0.9",
+        "console-gui-tools": "^3.2.2",
         "discord.js": "^14.13.0",
         "playwright": "^1.37.1",
         "playwright-extra": "^4.3.6",
