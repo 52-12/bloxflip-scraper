@@ -1,4 +1,21 @@
 import { ConsoleManager, ConfirmPopup, PageBuilder } from "console-gui-tools";
+import { WebhookClient, APIMessage } from "discord.js";
+import playwright from "playwright";
+import { addExtra } from "playwright-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
+import fs from "fs";
+import os from "os";
+import child_process from "child_process";
+import findChrome from "@vlasky/chrome-finder";
+import { EmbedBuilder } from "discord.js";
+
+let BiggestRain = "";
+let BiggestRobuxPerParticipant = "";
+let MostParticipatedRain = "";
+let FrequentHoster = "";
+let RainsCaught = "";
+let RanProgamAt = new Date();
+let TimeElapsed = "";
 
 const opt = {
     title: "Layout Test",
@@ -43,64 +60,39 @@ const closeApp = () => {
 
 GUI.refresh();
 
-const loremIpsumPage = new PageBuilder();
+const welcomepage = new PageBuilder();
 
-loremIpsumPage.addRow({
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    color: "red",
-    bg: "bgBlue",
+welcomepage.addRow({ text: "Welcome to my program!" });
+welcomepage.addRow({
+    text: "Thank you for installing bloxflip-scraper, please leave a star on github.",
 });
-
-loremIpsumPage.addRow({
-    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    color: "blue",
-    bg: "bgRed",
+welcomepage.addRow({
+    text: "If you have any questions feel free to ask at discord.gg/example we don't",
 });
+welcomepage.addRow({ text: "bite." });
 
-loremIpsumPage.addRow({
-    text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    color: "green",
-    bg: "bgYellow",
+const Options = new PageBuilder();
+Options.addRow({ text: "Embed editor" });
+Options.addRow({ text: "Content editor" });
+Options.addRow({ text: "Change minimum rain amount" });
+Options.addRow({ text: "Ping when a certain amount" });
+
+const Stats = new PageBuilder();
+Stats.addRow({ text: `Biggest Rain: ${BiggestRain}` });
+Stats.addRow({
+    text: `Biggest Robux Per Participant: ${BiggestRobuxPerParticipant}`,
 });
+Stats.addRow({ text: `Most Participated Rain: ${MostParticipatedRain}` });
+Stats.addRow({ text: `Frequent Hoster: ${FrequentHoster}` });
+Stats.addRow({ text: `Rains Caught: ${RainsCaught}` });
+Stats.addRow({ text: `Ran program at: ${RanProgamAt}` });
+Stats.addRow({ text: `Time elapsed:  ${TimeElapsed}` });
 
-loremIpsumPage.addRow({
-    text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    color: "yellow",
-    bg: "bgGreen",
-});
+GUI.setPage(welcomepage, 0, "Welcome!");
+GUI.setPage(Stats, 3, "Stats");
+GUI.setPage(Options, 2, "Options");
 
-loremIpsumPage.addRow({
-    text: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    color: "cyan",
-    bg: "bgMagenta",
-});
-
-const loremIpsumOverflowedPage = new PageBuilder();
-
-// add some random text to the page
-for (let i = 0; i < 100; i++) {
-    loremIpsumOverflowedPage.addRow({
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-        color: "red",
-        bg: "bgBlue",
-    });
-}
-
-GUI.setPage(loremIpsumPage, 0, "Lorem Ipsum");
-GUI.setPage(loremIpsumOverflowedPage, 3, "Lorem Ipsum Overflowed");
-GUI.setPage(new PageBuilder(), 2, "Page 3");
-
-console.log("Done");
-
-import { WebhookClient, APIMessage } from "discord.js";
-import playwright from "playwright";
-import { addExtra } from "playwright-extra";
-import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import fs from "fs";
-import os from "os";
-import child_process from "child_process";
-import findChrome from "@vlasky/chrome-finder";
-import { EmbedBuilder } from "discord.js";
+console.log("Loaded GUI");
 
 export const getEmbed = (
     amountOfRobux: string,
@@ -233,6 +225,42 @@ let runLoop = new Set();
 chromium
     .launch({ headless: false, executablePath: chromePath })
     .then(async (browser) => {
+        new Promise((resolve, reject) => {
+            const loop = () => {
+                setTimeout(async () => {
+                    let ms = RanProgamAt.getTime() - new Date().getTime();
+                    function convertMS(ms: number) {
+                        var d: string | number,
+                            h: string | number,
+                            m: string | number,
+                            s: string | number;
+                        s = Math.floor(ms / 1000);
+                        m = Math.floor(s / 60);
+                        s = s % 60;
+                        h = Math.floor(m / 60);
+                        m = m % 60;
+                        d = Math.floor(h / 24);
+                        h = h % 24;
+                        return (
+                            d +
+                            " days, " +
+                            h +
+                            " hours, " +
+                            m +
+                            " minutes, " +
+                            s +
+                            " seconds."
+                        );
+                    }
+                    TimeElapsed = convertMS(ms);
+                    GUI.refresh();
+                    console.log("s");
+                }, 1000);
+            };
+
+            loop();
+        });
+
         const page = await browser.newPage();
         // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
         // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
