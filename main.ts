@@ -9,13 +9,15 @@ import child_process from "child_process";
 import findChrome from "@vlasky/chrome-finder";
 import { EmbedBuilder } from "discord.js";
 
-let BiggestRain = "";
-let BiggestRobuxPerParticipant = "";
-let MostParticipatedRain = "";
+let BiggestRain = 0;
+let BiggestRobuxPerParticipant = 0;
+let MostParticipatedRain = 0;
 let FrequentHoster = "";
-let RainsCaught = "";
+let RainsCaught = 0;
 let RanProgamAt = new Date();
 let TimeElapsed = "";
+
+let hosters: string[] = [];
 
 const opt = {
     title: "Layout Test",
@@ -58,41 +60,18 @@ const closeApp = () => {
     process.exit();
 };
 
-GUI.refresh();
-
-const welcomepage = new PageBuilder();
-
-welcomepage.addRow({ text: "Welcome to my program!" });
-welcomepage.addRow({
-    text: "Thank you for installing bloxflip-scraper, please leave a star on github.",
-});
-welcomepage.addRow({
-    text: "If you have any questions feel free to ask at discord.gg/example we don't",
-});
-welcomepage.addRow({ text: "bite." });
-
-const Options = new PageBuilder();
-Options.addRow({ text: "Embed editor" });
-Options.addRow({ text: "Content editor" });
-Options.addRow({ text: "Change minimum rain amount" });
-Options.addRow({ text: "Ping when a certain amount" });
-
-const Stats = new PageBuilder();
-Stats.addRow({ text: `Biggest Rain: ${BiggestRain}` });
-Stats.addRow({
-    text: `Biggest Robux Per Participant: ${BiggestRobuxPerParticipant}`,
-});
-Stats.addRow({ text: `Most Participated Rain: ${MostParticipatedRain}` });
-Stats.addRow({ text: `Frequent Hoster: ${FrequentHoster}` });
-Stats.addRow({ text: `Rains Caught: ${RainsCaught}` });
-Stats.addRow({ text: `Ran program at: ${RanProgamAt}` });
-Stats.addRow({ text: `Time elapsed:  ${TimeElapsed}` });
-
-GUI.setPage(welcomepage, 0, "Welcome!");
-GUI.setPage(Stats, 3, "Stats");
-GUI.setPage(Options, 2, "Options");
-
 console.log("Loaded GUI");
+
+const mostAmountOf = (arr: string[]) => {
+    const mostOf = arr
+        .sort(
+            (a, b) =>
+                arr.filter((v) => v === a).length -
+                arr.filter((v) => v === b).length
+        )
+        .pop();
+    return mostOf ? mostOf : "";
+};
 
 export const getEmbed = (
     amountOfRobux: string,
@@ -100,6 +79,25 @@ export const getEmbed = (
     participants: string,
     robloxAvatar: string
 ) => {
+    const amountOfRobuxInANumber = Number(amountOfRobux.replace(/,/g, ""));
+    const participantsInANumber = Number(participants);
+    const RobuxPerParticipant = (
+        amountOfRobuxInANumber / participantsInANumber
+    ).toFixed(2);
+    const mostRainHosted = mostAmountOf(hosters.slice());
+
+    if (amountOfRobuxInANumber > BiggestRain) {
+        BiggestRain = amountOfRobuxInANumber;
+    }
+    if (Number(RobuxPerParticipant) > BiggestRobuxPerParticipant) {
+        BiggestRobuxPerParticipant = Number(RobuxPerParticipant);
+    }
+    if (FrequentHoster != mostRainHosted) {
+        FrequentHoster = mostRainHosted;
+    }
+    if (participantsInANumber > MostParticipatedRain) {
+        MostParticipatedRain = participantsInANumber;
+    }
     let embed = new EmbedBuilder()
         .setTitle(`${amountOfRobux} Rain`)
         .setURL("https://bloxflip.com/")
@@ -109,10 +107,7 @@ export const getEmbed = (
         .setDescription(
             `**Host:** [${host}](https://www.roblox.com/users/profile?username=${host})\n` +
                 `**Participants:** ${participants}\n` +
-                `**Robux Per Participant** ${(
-                    Number(amountOfRobux.replace(/,/g, "")) /
-                    Number(participants)
-                ).toFixed(2)}`
+                `**Robux Per Participant** ${RobuxPerParticipant}`
         );
     if (robloxAvatar) {
         return embed.setThumbnail(robloxAvatar);
@@ -223,12 +218,12 @@ try {
 let runLoop = new Set();
 
 chromium
-    .launch({ headless: false, executablePath: chromePath })
+    .launch({ headless: true, executablePath: chromePath })
     .then(async (browser) => {
         new Promise((resolve, reject) => {
             const loop = () => {
                 setTimeout(async () => {
-                    let ms = RanProgamAt.getTime() - new Date().getTime();
+                    let ms = new Date().getTime() - RanProgamAt.getTime();
                     function convertMS(ms: number) {
                         var d: string | number,
                             h: string | number,
@@ -253,8 +248,46 @@ chromium
                         );
                     }
                     TimeElapsed = convertMS(ms);
+
                     GUI.refresh();
-                    console.log("s");
+
+                    const welcomepage = new PageBuilder();
+
+                    welcomepage.addRow({ text: "Welcome to my program!" });
+                    welcomepage.addRow({
+                        text: "Thank you for installing bloxflip-scraper, please leave a star on github.",
+                    });
+                    welcomepage.addRow({
+                        text: "If you have any questions feel free to ask at discord.gg/example we don't",
+                    });
+                    welcomepage.addRow({ text: "bite." });
+
+                    const Options = new PageBuilder();
+                    Options.addRow({ text: "Embed editor" });
+                    Options.addRow({ text: "Content editor" });
+                    Options.addRow({ text: "Change minimum rain amount" });
+                    Options.addRow({ text: "Ping when a certain amount" });
+
+                    const Stats = new PageBuilder();
+                    Stats.addRow({ text: `Biggest Rain: ${BiggestRain}` });
+                    Stats.addRow({
+                        text: `Biggest Robux Per Participant: ${BiggestRobuxPerParticipant}`,
+                    });
+                    Stats.addRow({
+                        text: `Most Participated Rain: ${MostParticipatedRain}`,
+                    });
+                    Stats.addRow({
+                        text: `Frequent Hoster: ${FrequentHoster}`,
+                    });
+                    Stats.addRow({ text: `Rains Caught: ${RainsCaught}` });
+                    Stats.addRow({ text: `Ran program at: ${RanProgamAt}` });
+                    Stats.addRow({ text: `Time elapsed:  ${TimeElapsed}` });
+
+                    GUI.setPage(welcomepage, 0, "Welcome!");
+                    GUI.setPage(Stats, 3, "Stats");
+                    GUI.setPage(Options, 2, "Options");
+
+                    loop();
                 }, 1000);
             };
 
@@ -262,13 +295,13 @@ chromium
         });
 
         const page = await browser.newPage();
-        // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
+        await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
         // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
         // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
         // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
-        await page.goto("https://bloxflip.com/");
-        await page.getByRole("button", { name: "Understood! 🕹️" }).click();
-        await page.getByLabel("Open chat").click();
+        // await page.goto("https://bloxflip.com/");
+        // await page.getByRole("button", { name: "Understood! 🕹️" }).click();
+        // await page.getByLabel("Open chat").click();
 
         while (true) {
             let robloxAvatar = "";
@@ -288,11 +321,16 @@ chromium
                 Number(rainInfo.amountOfRobux.replace(/,/g, "")) >
                 Number(config.minimumRain)
             ) {
-                console.log({
-                    amountOfRobux: rainInfo.amountOfRobux,
-                    participants: rainInfo.participants,
-                    host: rainInfo.host,
-                });
+                RainsCaught++;
+                hosters.push(rainInfo.host);
+
+                console.log(
+                    JSON.stringify({
+                        amountOfRobux: rainInfo.amountOfRobux,
+                        participants: rainInfo.participants,
+                        host: rainInfo.host,
+                    })
+                );
 
                 const embed = getEmbed(
                     rainInfo.amountOfRobux,
