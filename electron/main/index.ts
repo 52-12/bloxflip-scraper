@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { release } from 'node:os';
 import { join } from 'node:path';
 import { update } from './update';
+import { runPlaywright } from './scraper';
 
 // The built directory structure
 //
@@ -77,6 +78,8 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win);
+
+  runPlaywright((url = ''));
 }
 
 app.whenReady().then(createWindow);
