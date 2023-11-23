@@ -114,7 +114,7 @@ chromium
             const getParagraphState = async (p: typeof paragraph) => {
                 const numbersRegex = (
                     await p.innerText({ timeout: 200 })
-                ).match(/\b\d[\d,.]*\b/g);
+                ).match(/-?\b\d[\d,.]*\b/g);
                 const amountOfRobux = numbersRegex
                     ? numbersRegex[0]
                     : "it's broken";
