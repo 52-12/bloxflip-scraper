@@ -7,11 +7,12 @@ const chromium = addExtra(playwright.chromium);
 chromium.use(StealthPlugin());
 
 export async function runPlaywright(
+  headless = true,
   url = 'https://bloxflip.com/',
   chromePath = findChrome()
 ) {
   chromium
-    .launch({ headless: false, executablePath: chromePath })
+    .launch({ headless: headless, executablePath: chromePath })
     .then(async (browser) => {
       const page = await browser.newPage();
       // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");

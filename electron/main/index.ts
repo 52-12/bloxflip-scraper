@@ -79,7 +79,7 @@ async function createWindow() {
   // Apply electron-updater
   update(win);
 
-  runPlaywright((url = ''));
+  runPlaywright(false);
 }
 
 app.whenReady().then(createWindow);
