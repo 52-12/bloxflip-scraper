@@ -218,7 +218,7 @@ chromium
 
       let rainInfo = await getParagraphState(paragraph);
       if (
-        Number(rainInfo.amountOfRobux.replace(/,/g, "")) >
+        Number(rainInfo.amountOfRobux.replace(/,/g, "")) >=
         Number(config.minimumRain)
       ) {
         console.log({
