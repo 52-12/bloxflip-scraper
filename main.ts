@@ -7,13 +7,69 @@ import fs from "fs";
 import os from "os";
 import child_process from "child_process";
 import findChrome from "@vlasky/chrome-finder";
-import isInvalidUsername from "./usernameValidationUtils";
 const chromePath = findChrome();
 
 const chromium = addExtra(playwright.chromium);
 chromium.use(StealthPlugin());
 
 let config: { url: string; pingWho: string; minimumRain: string };
+
+const usernameTooLong = (username: string): boolean => {
+  return username.length > 20;
+};
+
+const usernameTooShort = (username: string): boolean => {
+  return username.length < 3;
+};
+
+const usernameStartsOrEndsWithUnderscore = (username: string): boolean => {
+  const trimmedUsername = username.trim();
+  const l = trimmedUsername.length;
+  if (trimmedUsername[0] === "_" || trimmedUsername[l - 1] === "_") {
+    return true;
+  }
+  return false;
+};
+
+const usernameHasMoreThanOneUnderscore = (username: string): boolean => {
+  return username.split("_").length > 2;
+};
+
+const usernameRegexInvalid = (username: string): boolean => {
+  let regexFail = username.indexOf(" ") !== -1;
+  const re = /^[a-zA-Z0-9_]*$/;
+  regexFail = regexFail || !re.exec(username);
+  return regexFail;
+};
+
+const containsHtml = (inputText: string): boolean => {
+  // this wil not catch html with leading whitespace in tag, like < a>
+  // however, this is not valid html: https://www.w3.org/TR/REC-xml/#sec-starttags
+  const matches = /<[a-z][\s\S]*>/i.exec(inputText);
+  if (matches && matches.length > 0) {
+    return true;
+  }
+  return false;
+};
+
+const isInvalidUsername = (username: string): boolean => {
+  if (usernameTooShort(username) || usernameTooLong(username)) {
+    return true;
+  }
+  if (usernameStartsOrEndsWithUnderscore(username)) {
+    return true;
+  }
+  if (usernameHasMoreThanOneUnderscore(username)) {
+    return true;
+  }
+  if (containsHtml(username)) {
+    return true;
+  }
+  if (usernameRegexInvalid(username)) {
+    return true;
+  }
+  return false;
+};
 
 // Synchronously prompt for input
 function prompt(message: string) {
@@ -91,13 +147,13 @@ chromium
   .launch({ headless: false, executablePath: chromePath })
   .then(async (browser) => {
     const page = await browser.newPage();
-    await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
+    // await page.goto("http://127.0.0.1:3000/webpage/6unfiree.html");
     // await page.goto('http://127.0.0.1:3000/webpage/Adamslayz_you.html')
     // await page.goto('http://127.0.0.1:3000/webpage/NoobyNolax.html')
     // await page.goto('http://127.0.0.1:3000/webpage/PFB1cg.html')
-    // await page.goto("https://bloxflip.com/");
-    // await page.getByRole("button", { name: "Understood! 🕹️" }).click();
-    // await page.getByLabel("Open chat").click();
+    await page.goto("https://bloxflip.com/");
+    await page.getByRole("button", { name: "Understood! 🕹️" }).click();
+    await page.getByLabel("Open chat").click();
 
     while (true) {
       let robloxAvatar = "";
